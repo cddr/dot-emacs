@@ -1,0 +1,5 @@
+.backups
+.cask
+.git
+elpa/
+server/

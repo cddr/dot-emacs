@@ -14,8 +14,7 @@
   (ANY 2)
   (context 2))
 
-(define-clojure-indent
-  (form-to 'defun))
+
 
 (defun my-init-clojure-mode ()
   (cider-turn-on-eldoc-mode)
