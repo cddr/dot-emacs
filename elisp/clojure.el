@@ -1,6 +1,4 @@
 
-
-(add-to-list 'load-path "~/.emacs.d/vendor/cider")
 (require 'cider)
 (require 'clojure-mode)
 

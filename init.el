@@ -1,35 +1,22 @@
+;;; Package Initialization ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Added by Package.el.  This must come before configurations of
-;; installed packages.  Don't delete this line.  If you don't want it,
-;; just comment it out by adding a semicolon to the start of the line.
-;; You may delete these explanatory comments.
-;;
-;; (package-initialize)
+(require 'package)
 
-(defconst emacs-start-time (current-time))
+(setq
+ package-enable-at-startup nil
 
-(unless noninteractive
-  (message "Loading %s..." load-file-name))
+ package-archives '(("org"       . "http://orgmode.org/elpa/")
+                    ("gnu"       . "http://elpa.gnu.org/packages/")
+                    ("melpa"     . "https://melpa.org/packages/")
+                    ("marmalade" . "http://marmalade-repo.org/packages/")))
 
+(package-initialize)
 
-;;; Cask ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
 
-(progn
-  (if (string-equal system-type "darwin")
-      (require 'cask "/usr/local/share/emacs/site-lisp/cask/cask.el")
-    (require 'cask "~/.cask/cask.el"))
-  (cask-initialize))
-
-;;; Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defun insert-divider (title)
-  "Inserts a divider for breaking up code into paragraphs"
-  (interactive "sTitle: ")
-  (let ((pos (beginning-of-line))
-        (line (format ";;; %s %s"
-                      title
-                      (make-string (- 80 (length (format ";;; %s " title))) ?\;))))
-    (insert line)))
+(require 'use-package) ; guess what this one does too ?
 
 ;;; Customizations ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -41,114 +28,79 @@
          (read (current-buffer)))))
   (eval settings))
 
-;; (add-hook 'after-init-hook (lambda ()
-;; 														 (server-force-delete)
-;; 														 (server-start t)))
+(use-package eshell :ensure t
+	:config (load-file "~/.emacs.d/eshell-functions.el"))
 
-(use-package no-littering)						
 
-(use-package clojure-mode
+(use-package exec-path-from-shell :ensure t
+	:config
+	(setq exec-path-from-shell-variables
+				`("PATH" "MANPATH" "ARTIFACTORY_USER" "ARTIFACTORY_PASSWORD"))
+	:init
+	(when (memq window-system '(mac ns x))
+		(exec-path-from-shell-initialize)))
+
+(use-package no-littering :ensure t)
+
+(use-package clojure-mode :ensure t
   :config
-  (load (expand-file-name "clojure-indentation.el" user-emacs-directory))
+  (load (expand-file-name "clojure-indentation.el" user-emacs-directory)))
 
-	(use-package cider
-		:ensure t
-		:config
-		(require 'cider-eldoc)
-		(add-hook 'cider-mode-hook #'cider-eldoc-setup)))
+(use-package cider :ensure t
+	:config
+	(require 'cider-eldoc)
+	(add-hook 'cider-mode-hook #'cider-eldoc-setup))
 
-(use-package exec-path-from-shell
+(use-package exec-path-from-shell :ensure t
   :if (memq window-system '(mac ns))
   :config
   (exec-path-from-shell-initialize))
 
-(use-package gist
+(use-package gist :ensure t
   :no-require t
   :bind (("C-c G" . gist-region-or-buffer)))
 
-(use-package helm-config
-  :bind (("C-c h" . helm-command-prefix)
-         ("M-x" . helm-M-x)
-         ("C-x C-f" . helm-find-files)
-         ("C-x b" . helm-mini))
-
-  :init
-  (add-hook 'eshell-mode-hook
-            (lambda ()
-              (eshell-cmpl-initialize)
-              (define-key eshell-mode-map [remap eshell-pcomplete] 'helm-esh-pcomplete)
-              (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)))
-
-  :config
-  (use-package helm
-    :config
-    (helm-autoresize-mode 1))
-
-  (bind-key "<tab>" #'helm-execute-persistent-action helm-map)
-  (bind-key "C-i" #'helm-execute-persistent-action helm-map)
-  (bind-key "C-z" #'helm-select-action helm-map)
-  (bind-key "A-v" #'helm-previous-page helm-map)
-
-  (use-package helm-descbinds
-    :bind ("C-h b" . helm-descbinds)
-    :init
-    (fset 'describe-bindings 'helm-descbinds)
-    :config
-    (require 'helm-config)))
-
-(use-package isearch
-  :bind (("C-M-r" . isearch-backward-other-window)
-         ("C-M-s" . isearch-forward-other-window))
-  :preface
-  (defun isearch-backward-other-window ()
-    (interactive)
-    (split-window-vertically)
-    (call-interactively 'isearch-backward))
-
-  (defun isearch-forward-other-window ()
-    (interactive)
-    (split-window-vertically)
-    (call-interactively 'isearch-forward))
-
-  :config
-  (bind-key "C-c" #'isearch-toggle-case-fold isearch-mode-map)
-  (bind-key "C-t" #'isearch-toggle-regexp isearch-mode-map)
-  (bind-key "C-^" #'isearch-edit-string isearch-mode-map)
-  (bind-key "C-i" #'isearch-complete isearch-mode-map))
+(use-package direnv :ensure t
+	:config
+	(direnv-mode))
 
 (use-package saveplace
   :init (setq save-place-file (expand-file-name ".places" user-emacs-directory))
   :config
   (save-place-mode 1))
 
-;; (require 'helm-config)
-;; (require 'better-defaults)
-;; (require 'web-shortcuts)
-;; (require 'git)
-;; (require 'ruby)
-;; (require 'clojure)
+(use-package ivy-hydra :ensure t)
 
-;; (progn
-;;   (setq custom-file "~/.emacs.d/custom-file.el")
-;;    (load custom-file))
+(use-package ivy :ensure t
+	:init (ivy-mode 1)
+	:config
+	(setq ivy-use-virtual-buffers t
+				ivy-count-format "(%d/%d) ")
 
-;; (use-package exec-path-from-shell
-;;   :config
-;;   (exec-path-from-shell-initialize))
+	(global-set-key (kbd "C-s") 'swiper)
+	(global-set-key (kbd "M-x") 'counsel-M-x)
+	(global-set-key (kbd "C-x C-f") 'counsel-find-file)
+	(global-set-key (kbd "C-c g") 'counsel-git)
+	(global-set-key (kbd "C-c j") 'counsel-git-grep)
+	(global-set-key (kbd "C-c k") 'counsel-ag)
+	(global-set-key (kbd "<f1> f") 'counsel-describe-function)
+	(global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+	(global-set-key (kbd "<f1> l") 'counsel-find-library)
+	(global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+	(global-set-key (kbd "<f2> u") 'counsel-unicode-char))	
 
-;; (use-package helm-mode
-;;    :config
-;;   (helm-mode 1)
-;;   (global-set-key (kbd "C-x C-f") 'helm-find-files)
+(defun unfill-region (beg end)
+  "Unfill the region, joining text paragraphs into a single
+    logical line.  This is useful, e.g., for use with
+    `visual-line-mode'."
+  (interactive "*r")
+  (let ((fill-column (point-max)))
+    (fill-region beg end)))
 
-;;    (when (executable-find "ack")
-;;      (setq helm-grep-default-command "ack -Hn --no-group --no-color %e %p %f"
-;;            helm-grep-default-recurse-command "ack -H --no-group --no-color %e %p %f")))
+(exec-path-from-shell-copy-env "AWS_SESSION_TOKEN")
+(exec-path-from-shell-copy-env "AWS_SECRET_ACCESS_KEY")
+(exec-path-from-shell-copy-env "AWS_ACCESS_KEY_ID")
+(exec-path-from-shell-copy-env "AWS_REGION")
 
+(server-start)
 
-;; ;; initialization
-;; (server-force-delete)
-;; (server-start t)
-;; (eshell)
-
-;; (global-set-key (kbd "C-M-u") 'backward-up-list)

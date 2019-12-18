@@ -1,6 +1,4 @@
 
-
-(add-to-list 'load-path "~/.emacs.d/vendor/cider")
 (require 'cider)
 (require 'clojure-mode)
 
@@ -13,8 +11,6 @@
   (HEAD 2)
   (ANY 2)
   (context 2))
-
-
 
 (defun my-init-clojure-mode ()
   (cider-turn-on-eldoc-mode)

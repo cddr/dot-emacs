@@ -13,12 +13,14 @@
  '(column-number-mode t)
  '(custom-enabled-themes (quote (tsdh-dark)))
  '(custom-file "~/.emacs.d/settings.el")
+ '(debug-on-error nil)
  '(delete-old-versions t)
  '(erc-hide-list (quote ("JOIN" "KICK" "NICK" "PART" "QUIT" "MODE")))
  '(erc-sound-mode t)
  '(eshell-visual-commands
 	 (quote
 		("vi" "screen" "top" "less" "more" "lynx" "ncftp" "pine" "tin" "trn" "elm")))
+ '(groovy-indent-offset 2)
  '(ido-auto-merge-work-directories-length -1)
  '(ido-enable-flex-matching nil)
  '(js-indent-level 2)
@@ -32,10 +34,13 @@
  '(nxml-sexp-element-flag t)
  '(package-selected-packages
 	 (quote
-		(jtags helm-dash helm-projectile projectile paredit helm-ag ag helm-git-grep exec-path-from-shell helm clojure-mode magit company solarized-theme better-defaults use-package cider)))
+		(ivy-hydra ivy-mode direnv markdown-mode git-link gif-screencast magit wgrep counsel gist exec-path-from-shell clojure-mode no-littering cider launchctl package-build shut-up epl git commander f dash s)))
  '(safe-local-variable-values
 	 (quote
-		((cider-boot-parameters . "cider repl -s ...others... wait")
+		((scss-mode
+			(css-indent-offset . 2))
+		 (time-stamp-active . t)
+		 (cider-boot-parameters . "cider repl -s ...others... wait")
 		 (cider-boot-parameters . "dev")
 		 (cider-test-infer-test-ns . my-infer-test-ns)
 		 (cider-test-infer-test-ns quote my-infer-test-ns)
@@ -67,12 +72,14 @@
  '(scroll-bar-mode nil)
  '(select-enable-clipboard t)
  '(select-enable-primary t)
- '(server-use-tcp t)
+ '(server-use-tcp nil)
+ '(sh-basic-offset 2)
  '(tab-always-indent (quote complete))
  '(tab-width 2)
  '(tool-bar-mode nil)
  '(tramp-syntax (quote default) nil (tramp))
- '(version-control t))
+ '(version-control t)
+ '(visible-bell t))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

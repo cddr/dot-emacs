@@ -1,5 +1,14 @@
 .backups
 .cask
 .git
+.cache
+.places
 elpa/
 server/
+auto-save-list/
+network-security.data
+places
+recentf
+tramp
+url/
+var/
